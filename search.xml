@@ -4,6 +4,31 @@
   
     
     <entry>
+      <title>关于学习go语言的一些记录.md</title>
+      <link href="/2023/09/24/%E5%85%B3%E4%BA%8E%E5%AD%A6%E4%B9%A0go%E8%AF%AD%E8%A8%80%E7%9A%84%E4%B8%80%E4%BA%9B%E8%AE%B0%E5%BD%95/"/>
+      <url>/2023/09/24/%E5%85%B3%E4%BA%8E%E5%AD%A6%E4%B9%A0go%E8%AF%AD%E8%A8%80%E7%9A%84%E4%B8%80%E4%BA%9B%E8%AE%B0%E5%BD%95/</url>
+      
+        <content type="html"><![CDATA[<link rel="stylesheet" class="aplayer-secondary-style-marker" href="/assets/css/APlayer.min.css"><script src="/assets/js/APlayer.min.js" class="aplayer-secondary-script-marker"></script><h3 id="关于学习Go语言的一些记录"><a href="#关于学习Go语言的一些记录" class="headerlink" title="关于学习Go语言的一些记录"></a>关于学习Go语言的一些记录</h3><p>最近秋招来临，心血来潮的我走进了秋招的会场，拿着劣质的简历面试了几场C&#x2F;C++的后台开发工程师的岗位。其中我有问到公司内部后台开发用什么语言较多，技术经理回答说C&#x2F;C++,Java,Python基本都有，但是现在正在向Go转型，以后呢也基本会转型使用Go语言。面试结束回来之后，我才开始了解Go语言的起源和发展，并对于这个“后起之秀”产生了浓厚的兴趣。</p><p>工欲善其事必先利其器，学习Go语言要先搭建编译环境，这里我选择了<code>WSL+Ubuntu20.04+VSCode</code>平台来搭建编译环境。但是过程中遇到了一些“坑”，因此写一篇博客来记录一下。</p><p>首先就是Ubuntu自带的软件源不能够提供最新版本的Go源代码，这就导致在运行VSCode的时候，会出现一些工具包下载失败的情况，报错信息提示要求Go的版本号在1.14以上。在此我强烈建议在<a href="https://go.dev/">官网下载</a>最新版本的源代码。</p><p>下载完成之后，执行：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo tar -zxf go1.21.1.linux-amd64.tar.gz -C /usr/local</span><br></pre></td></tr></table></figure><p>将压缩包解压至&#x2F;usr&#x2F;local&#x2F;目录下，<code>cd /usr/local/</code>切换至&#x2F;usr&#x2F;local&#x2F;目录下可以看到多出来了一个go目录。此时命令行输入<code>go version</code>会提示找不到命令，说明这时候我们的环境变量和用户变量还没有设置好，打开命令行，执行：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo vim ~/.bashrc <span class="comment"># 需要按下i进入插入模式，滑到最后一行</span></span><br><span class="line"><span class="built_in">export</span> GOROOT=/usr/local/go</span><br><span class="line"><span class="built_in">export</span> GOPATH=<span class="variable">$HOME</span>/go</span><br><span class="line"><span class="built_in">export</span> PATH=<span class="variable">$PATH</span>:<span class="variable">$GOROOT</span>/bin:<span class="variable">$GOPATH</span>/bin <span class="comment"># 按esc之后在键盘输入:wq三个字符</span></span><br><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure><p>执行完成之后，我们再次在命令行中执行<code>go version</code>将会出现类似于<code>go version go1.21.1 linux/amd64</code>的版本号，说明我们的环境变量设置成功。</p><blockquote><p>最值得注意的一点，坑了我好久，问了很多次ChatGPT都没能够解决！！！</p></blockquote><p>在命令行中执行<code>go env</code>我们会看到很多行版本信息，我们只需要关注第一行的<code>GO1111MODULE=&quot;&quot;</code>引号中的字符串，建议初学者改成<code>off</code>，只需要在命令行中执行：<code>go env -w GO111MODULE=off</code>，方便后续使用<code>VScode</code>实现本地的包引用(因为可能<code>go modules</code>对新手不是很友好，所以就暂时先关闭这一选项，这也是我踩的一个大坑！否则就会疯狂报类似的错误)。</p><p><img src="/img/cover/image-20230924053233415.png" alt="image-20230924053233415"></p><blockquote><p>OK，至此我们已经完成了Go语言环境的配置，剩下的就是使用VSCode构建一个简单的项目了！</p></blockquote><ul><li><p>打开VSCode搜索并下载go插件，由Go Team at Google开发</p></li><li><p>打开命令行，如果在~&#x2F;目录下执行<code>mkdir -r go/src/goProject   </code>创建go文件夹，并在go文件夹下创建src子文件夹，并在src文件夹下创建goProject文件夹用于存放项目源码。</p></li><li><p>用VSCode打开goProject文件夹，创建myLib文件夹和main.go源代码，并在myLib文件夹中创建hello.go源代码</p></li><li><pre><code class="go"># main.gopackage mainimport (    mylib &quot;goProject/myLib&quot;)func main() &#123;    mylib.HelloPrint()&#125;<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">- ```go</span><br><span class="line">  # hello.go</span><br><span class="line">  package mylib</span><br><span class="line">  </span><br><span class="line">  import &quot;fmt&quot;</span><br><span class="line">  </span><br><span class="line">  func HelloPrint() &#123;</span><br><span class="line">  fmt.Println(&quot;Hello Go Language:)&quot;)</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure></code></pre></li><li><p>在VSCode中新建终端，执行：<code>go run main.go</code>即可在终端中看到输出信息<code>Hello Go Language:)</code></p><p><img src="/img/cover/image-20230924052903282.png" alt="image-20230924052850525"></p></li><li><p>至此，Go语言环境和VSCode编辑环境都已经配置完成！完结撒花~</p><blockquote><p>【注】如果执行不成功，打开VSCode的设置，搜索Go:GOPATH，勾选以下选项即可！</p><p><img src="/img/cover/image-20230924052507335.png" alt="image-20230924052507335"></p></blockquote></li></ul><p>本人配置过程参考B站视频：<a href="https://www.bilibili.com/video/BV1gf4y1r79E?p=2&vd_source=f1043071fb4d917cdebd07a0959a1f47">2-Golang开发环境重点和IDE选型推荐_哔哩哔哩_bilibili</a></p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 学习记录 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> Go </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>克里金插值算法</title>
       <link href="/2023/07/25/%E5%85%8B%E9%87%8C%E9%87%91%E6%8F%92%E5%80%BC%E7%AE%97%E6%B3%95/"/>
       <url>/2023/07/25/%E5%85%8B%E9%87%8C%E9%87%91%E6%8F%92%E5%80%BC%E7%AE%97%E6%B3%95/</url>
